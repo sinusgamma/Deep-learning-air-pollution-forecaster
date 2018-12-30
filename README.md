@@ -1,5 +1,5 @@
 # Deep learning air-pollution forecaster
-## for Udacity: PyTorch Scholarship Challenge from Facebook
+## project for Udacity PyTorch Scholarship Challenge from Facebook
 
 Air pollution forecaster based on weather data and earlier pollution measurements.
 
