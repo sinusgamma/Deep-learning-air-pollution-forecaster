@@ -9,13 +9,30 @@ Numerical models are good at forecasting common weather parameters like wind or 
 
 In this project, we build the deep learning part of the model.
 
-### Prerequisites
+### Data Explanation
 
-What things you need to install the software and how to install them
+The *'data\daily_clean_full.csv'* file containes the daily data of the weather parameters and air pollution (pm10) parameters. This is the cleaned merge of the *'daily_pm10.xlsx'* and the *'hourly_lorinc_2011-2018.xls'*
+datasourcees:
+https://rp5.ru/Weather_archive_in_Budapest,_Lorinc_(airport)
+http://www.levegominoseg.hu/automata-merohalozat?city=2
 
-```
-Give examples
-```
+*'daily_pm10.xlsx'*: measured PM10 in Budapest, 12 stations
+
+*'hourly_lorinc_2011-2018.xls'*: Budapest Pestszentlőrinc weather station history - measurement
+
+*'data\daily_clean_full.csv'* columns:<br />
+**temp_avr**: average temperature based on hourly averages - ºC<br />
+**temp_max**: maximum hourly temperature during the day - ºC<br />
+**temp_min**: minimum hourly temperature during the day - ºC<br />
+**pres**: mean sea level pressure - Hpa<br />
+**u, v**: meridional and zonal component of wind - m/s<br />
+**prec**: precipitation - mm (In stationdata we have 6h, 12h and 24h totals, and not hourly data. Some of the periods is missing. For simplicity in the cleaned data we use the largest of the above numbers, this way the order of magnitute of the precipitation remains, but the 24h total isn't precise. Later with better data this can be corrected.)<br />
+**datetime**: datetime - UTC<br />
+**pm10 station name**: pm10 concentration daily average - μg/m3<br />
+
+(I suggest to use 2011, 2012, 2013, 2015, 2016, 2017 as training, 2014 as validation and 2018 as test. Other solutions can work, but we should use the same data to compare models.)
+
+
 
 ### Installing
 
