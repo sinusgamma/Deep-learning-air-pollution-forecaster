@@ -5,12 +5,12 @@ import pandas as pd
 
 #%%
 # read source weather file
-df = pd.read_excel(r"hourly_lorinc_2011-2018.xls", skiprows=[0,1,2,3,4,5])
+df = pd.read_excel(r"data\hourly_lorinc_2011-2018.xls", skiprows=[0,1,2,3,4,5])
 df.head()
 
 #%%
 # read source pm10 file
-df_10 = pd.read_excel(r"daily_pm10.xlsx")
+df_10 = pd.read_excel(r"data\daily_pm10.xlsx")
 df_10.head()
 
 #%%
@@ -163,8 +163,8 @@ df_result.info()
 
 #%%
 # save to csv
-df_result.to_csv('daily_clean_full.csv', index=False)
+df_result.to_csv('data\daily_clean_full.csv', index=False)
 
 #%%
-df_full = pd.read_csv('daily_clean_full.csv')
+df_full = pd.read_csv('data\daily_clean_full.csv')
 df_full
