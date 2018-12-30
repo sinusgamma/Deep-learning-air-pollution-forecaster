@@ -5,13 +5,13 @@ import pandas as pd
 
 #%%
 # read source weather file
-df = pd.read_excel(r"E:\MachineLearning\Udacity\PytorchChallenge\air_pollution_project\hourly_lorinc_2011-2018.xls", skiprows=[0,1,2,3,4,5])
+df = pd.read_excel(r"hourly_lorinc_2011-2018.xls", skiprows=[0,1,2,3,4,5])
 df.head()
 
 #%%
 # read source pm10 file
-df_10 = pd.read_excel(r"E:\MachineLearning\Udacity\PytorchChallenge\air_pollution_project\daily_pm10.xlsx")
-df_10
+df_10 = pd.read_excel(r"daily_pm10.xlsx")
+df_10.head()
 
 #%%
 #retain important data
@@ -42,12 +42,13 @@ df['datetime'] = pd.to_datetime(df['datetime'], format='%d.%m.%Y %H:%M')
 df.head()
 
 #%%
-# to hpa
+# millimetre of mercury to hpa
 df['pres'] = df['pres']*1.3332239
 df.head()
 
 #%%
-# wind string to numbers
+# convert wind strings to numbers
+# split the strings
 new = df['w_dir'].str.split("the ", n = 1, expand = True)
 df['w_dir'] = new[1]
 
@@ -56,6 +57,7 @@ df['w_dir'] = new[1]
 df['w_dir'].unique()
 
 #%%
+# convert wind-strings to numbers
 # None won't matter because the corresponding wind speed is zero
 wind_dict = {   'north-west':315, 
                 'west-southwest':247.5, 
@@ -80,13 +82,13 @@ df.head()
 
 
 #%%
-#convert wind to u and w components
+#convert wind to u and w components (meridional and zonal components)
 # rad = 4.0*atan(1.0)/180
 # u = -spd*sin(rad*dir) 
 # v = -spd*cos(rad*dir)
 df['u'] = -df['w_speed']*np.sin((4.0*np.arctan(1.0)/180)*df['w_dir'])
 df['v'] = -df['w_speed']*np.cos((4.0*np.arctan(1.0)/180)*df['w_dir'])
-df
+df.head()
 
 #%%
 # set datetime to index to enable later resample
@@ -94,11 +96,15 @@ df = df.set_index('datetime')
 df.head()
 
 #%%
-# will missing precipitation data with 0
+# fill missing precipitation data with 0
 df['prec'] = pd.to_numeric(df['prec'], errors='coerce').fillna(0)
 
 #%%
 #resample for daily data
+# for prec: Because the are 6h, 12h, 24h measurement periods in our
+# dataset we keep the largest value from this for the day. This isn't
+# exact the exact precipitation during the day, but the period with
+# the highest amount. Later with better data it can be replaced.
 df_d = pd.DataFrame()
 df_d['temp_avr'] = df['temp'].resample('d').mean()
 df_d['temp_max'] = df['temp'].resample('d').max()
@@ -108,9 +114,10 @@ df_d['u'] = df['u'].resample('d').mean()
 df_d['v'] = df['v'].resample('d').mean()
 df_d['prec'] = df['prec'].resample('d').max()
 df_d['datetime'] = df_d.index
+df_d
 
 #%%
-# set datetime to index
+# convert station names to simpler strings
 df_10 = df_10.rename(columns={  'Dátum' : 'datetime',
                                 'Budapest Budatétény':'Budateteny',
                                 'Budapest Csepel':'Csepel',
@@ -124,8 +131,12 @@ df_10 = df_10.rename(columns={  'Dátum' : 'datetime',
                                 'Budapest Pesthidegkút':'Pesthidegkut',
                                 'Budapest Széna tér':'Szena',
                                 'Budapest Teleki tér':'Teleki'})
-df_10['datetime'] = pd.to_datetime(df_10['datetime'])
 df_10.head()
+
+#%%
+# convert to datetime object
+df_10['datetime'] = pd.to_datetime(df_10['datetime'], format='%Y.%m.%d')
+df_10
 
 #%%
 # convert missing data to np.nan
@@ -141,9 +152,14 @@ df_10.iloc[:,1:] = df_10.iloc[:,1:].interpolate()
 df_10.head()
 
 #%%
-# merge databases
+# merge databases inner join
 df_result = pd.merge(df_d, df_10, on='datetime')
+# check
 df_result.isnull().sum()
+
+#%%
+# check
+df_result.info()
 
 #%%
 # save to csv
