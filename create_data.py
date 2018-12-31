@@ -168,3 +168,22 @@ df_result.to_csv('data\daily_clean_full.csv', index=False)
 #%%
 df_full = pd.read_csv('data\daily_clean_full.csv')
 df_full
+
+#%%
+# sample and show one year period
+from matplotlib import pyplot as plt
+values = df_full[:365].values
+values
+
+#%%
+# specify columns to plot
+groups = [0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12]
+i = 1
+# plot each column
+plt.figure()
+for group in groups:
+	plt.subplot(len(groups), 1, i)
+	plt.plot(values[:, group])
+	plt.title(df_full.columns[group], y=0.5, loc='right')
+	i += 1
+plt.show()
