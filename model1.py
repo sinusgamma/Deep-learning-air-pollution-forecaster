@@ -5,6 +5,7 @@
 # ### Import resources and create data
 import torch
 from torch import nn
+import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 get_ipython().run_line_magic('matplotlib', 'inline')
@@ -14,6 +15,7 @@ from sklearn.preprocessing import StandardScaler
 #%%
 # load data
 df_full = pd.read_csv('data\daily_clean_full.csv')
+df_full['datetime'] = pd.to_datetime(df_full['datetime'], format='%Y-%m-%d')
 df_full.head()
 
 #%%
@@ -54,6 +56,17 @@ df.head()
 df['Teleki_ystd'] = df['Teleki'].shift(+1)
 # fill the missing day value with next day
 df['Teleki_ystd'] = df['Teleki_ystd'].fillna(method='bfill')
+# reorder columns, last column will be the label data
+df = df[[   'datetime',
+            'temp_avr', 
+            'temp_max', 
+            'temp_min', 
+            'pres', 
+            'u', 
+            'v',
+            'prec',
+            'Teleki_ystd',
+            'Teleki']]
 df.head()
 
 #%%
@@ -66,8 +79,10 @@ df_train_input = df_train.drop(columns=['Teleki'])
 df_train_label = df_train['Teleki']
 df_train_label
 # train tensors
-train_input = torch.tensor(df_train_input.values)
-train_label = torch.tensor(df_train_label.values)
+train_data = torch.tensor(df_train.values).float()
+train_input = torch.tensor(df_train_input.values).float()
+train_label = torch.tensor(df_train_label.values).float()
+train_data
 
 #%%
 # validation data
@@ -77,8 +92,10 @@ df_valid_input = df_valid.drop(columns=['Teleki'])
 df_valid_label = df_valid['Teleki']
 df_valid_label
 # validation tensors
-valid_input = torch.tensor(df_valid_input.values)
-valid_label = torch.tensor(df_valid_label.values)
+valid_data = torch.tensor(df_valid.values).float()
+valid_input = torch.tensor(df_valid_input.values).float()
+valid_label = torch.tensor(df_valid_label.values).float()
+valid_data
 
 #%%
 # test data
@@ -88,214 +105,193 @@ df_test_input = df_test.drop(columns=['Teleki'])
 df_test_label = df_test['Teleki']
 df_test_label
 # validation tensors
-test_input = torch.tensor(df_test_input.values)
-test_label = torch.tensor(df_test_label.values)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+test_data = torch.tensor(df_test.values).float()
+test_input = torch.tensor(df_test_input.values).float()
+test_label = torch.tensor(df_test_label.values).float()
 
 #%%
-plt.figure(figsize=(8,5))
-
-# how many time steps/data pts are in one batch of data
-seq_length = 20
-
-# generate evenly spaced data pts
-time_steps = np.linspace(0, np.pi, seq_length + 1)
-data = np.sin(time_steps)
-data.resize((seq_length + 1, 1)) # size becomes (seq_length+1, 1), adds an input_size dimension
-
-x = data[:-1] # all but the last piece of data
-y = data[1:] # all but the first
-
-# display the data
-plt.plot(time_steps[1:], x, 'r.', label='input, x') # x
-plt.plot(time_steps[1:], y, 'b.', label='target, y') # y
-
-plt.legend(loc='best')
-plt.show()
-
-#%% [markdown]
-# ---
-# ## Define the RNN
-# 
-# Next, we define an RNN in PyTorch. We'll use `nn.RNN` to create an RNN layer, then we'll add a last, fully-connected layer to get the output size that we want. An RNN takes in a number of parameters:
-# * **input_size** - the size of the input
-# * **hidden_dim** - the number of features in the RNN output and in the hidden state
-# * **n_layers** - the number of layers that make up the RNN, typically 1-3; greater than 1 means that you'll create a stacked RNN
-# * **batch_first** - whether or not the input/output of the RNN will have the batch_size as the first dimension (batch_size, seq_length, hidden_dim)
-# 
-# Take a look at the [RNN documentation](https://pytorch.org/docs/stable/nn.html#rnn) to read more about recurrent layers.
+# the function to yield the batches
+def get_batches(arr, batch_size, seq_length):
+    '''Create a generator that returns batches of size
+       batch_size x seq_length from arr.
+       
+       Arguments
+       ---------
+       arr: Array you want to make batches from
+       batch_size: Batch size, the number of sequences per batch
+       seq_length: Number of encoded chars in a sequence
+    '''
+    feature_number = arr.shape[1]
+    batch_size_total = batch_size * seq_length
+    # total number of batches we can make
+    n_batches = len(arr)//batch_size_total 
+    # Keep only enough days to make full batches
+    arr = arr[:n_batches * batch_size_total]
+    # Reshape into batch_size rows and feature_number vectors
+    arr = arr.reshape((-1, seq_length, feature_number))
+      
+    # iterate through the array, one sequence at a time
+    for n in range(0, batch_size, arr.shape[0]):
+        # The features
+        x= arr[n:n+batch_size,:,:-1]
+        # The targets
+        y = y= arr[n:n+batch_size,:,-1]
+        yield x, y
 
 #%%
-class RNN(nn.Module):
-    def __init__(self, input_size, output_size, hidden_dim, n_layers):
-        super(RNN, self).__init__()
-        
-        self.hidden_dim=hidden_dim
+# test get_batches function
+batches = get_batches(train_data, batch_size=2, seq_length=3)
+x, y = next(batches)
+print('x\n', x)
+print(x.shape)
+print('\ny\n', y)
+print(y.shape)
 
-        # define an RNN with specified parameters
-        # batch_first means that the first dim of the input and output will be the batch_size
-        self.rnn = nn.RNN(input_size, hidden_dim, n_layers, batch_first=True)
+#%%
+# build the model
+class LSTMForecaster(nn.Module):
+    
+    def __init__(self, input_size, n_hidden=256, n_layers=2,
+                               drop_prob=0.5, lr=0.001):
+        super().__init__()
+        self.input_size
+        self.drop_prob = drop_prob
+        self.n_layers = n_layers
+        self.n_hidden = n_hidden
+        self.lr = lr
         
-        # last, fully-connected layer
-        self.fc = nn.Linear(hidden_dim, output_size)
-
+        ## TODO: define the LSTM
+        self.lstm = nn.LSTM(input_size, n_hidden, n_layers, 
+                            dropout=drop_prob, batch_first=True)
+        
+        ## TODO: define a dropout layer
+        self.dropout = nn.Dropout(drop_prob)
+        
+        ## TODO: define the final, fully-connected output layer
+        self.fc = nn.Linear(n_hidden, 1)
+      
+    
     def forward(self, x, hidden):
-        # x (batch_size, seq_length, input_size)
-        # hidden (n_layers, batch_size, hidden_dim)
-        # r_out (batch_size, time_step, hidden_size)
-        batch_size = x.size(0)
-        
-        # get RNN outputs
-        r_out, hidden = self.rnn(x, hidden)
-        # shape output to be (batch_size*seq_length, hidden_dim)
-        r_out = r_out.view(-1, self.hidden_dim)  
-        
-        # get final output 
-        output = self.fc(r_out)
-        
-        return output, hidden
-
-#%% [markdown]
-# ### Check the input and output dimensions
-# 
-# As a check that your model is working as expected, test out how it responds to input data.
-
-#%%
-# test that dimensions are as expected
-test_rnn = RNN(input_size=1, output_size=1, hidden_dim=10, n_layers=2)
-
-# generate evenly spaced, test data pts
-time_steps = np.linspace(0, np.pi, seq_length)
-data = np.sin(time_steps)
-data.resize((seq_length, 1))
-
-test_input = torch.Tensor(data).unsqueeze(0) # give it a batch_size of 1 as first dimension
-print('Input size: ', test_input.size())
-
-# test out rnn sizes
-test_out, test_h = test_rnn(test_input, None)
-print('Output size: ', test_out.size())
-print('Hidden state size: ', test_h.size())
-
-#%% [markdown]
-# ---
-# ## Training the RNN
-# 
-# Next, we'll instantiate an RNN with some specified hyperparameters. Then train it over a series of steps, and see how it performs.
-
-#%%
-# decide on hyperparameters
-input_size=1 
-output_size=1
-hidden_dim=32
-n_layers=1
-
-# instantiate an RNN
-rnn = RNN(input_size, output_size, hidden_dim, n_layers)
-print(rnn)
-
-#%% [markdown]
-# ### Loss and Optimization
-# 
-# This is a regression problem: can we train an RNN to accurately predict the next data point, given a current data point?
-# 
-# >* The data points are coordinate values, so to compare a predicted and ground_truth point, we'll use a regression loss: the mean squared error.
-# * It's typical to use an Adam optimizer for recurrent models.
-
-#%%
-# MSE loss and Adam optimizer with a learning rate of 0.01
-criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(rnn.parameters(), lr=0.01) 
-
-#%% [markdown]
-# ### Defining the training function
-# 
-# This function takes in an rnn, a number of steps to train for, and returns a trained rnn. This function is also responsible for displaying the loss and the predictions, every so often.
-# 
-# #### Hidden State
-# 
-# Pay close attention to the hidden state, here:
-# * Before looping over a batch of training data, the hidden state is initialized
-# * After a new hidden state is generated by the rnn, we get the latest hidden state, and use that as input to the rnn for the following steps
-
-#%%
-# train the RNN
-def train(rnn, n_steps, print_every):
+        ''' Forward pass through the network. 
+            These inputs are x, and the hidden/cell state `hidden`. '''
+        r_output, hidden = self.lstm(x, hidden)
+        out = self.dropout(r_output)     
+        # Stack up LSTM outputs using view
+        out = out.contiguous().view(-1, self.n_hidden) 
+        # put x through the fully-connected layer
+        out = self.fc(out)
+        # return the final output and the hidden state
+        return out, hidden
     
-    # initialize the hidden state
-    hidden = None      
     
-    for batch_i, step in enumerate(range(n_steps)):
-        # defining the training data 
-        time_steps = np.linspace(step * np.pi, (step+1)*np.pi, seq_length + 1)
-        data = np.sin(time_steps)
-        data.resize((seq_length + 1, 1)) # input_size=1
+    def init_hidden(self, batch_size):
+        ''' Initializes hidden state '''
+        # Create two new tensors with sizes n_layers x batch_size x n_hidden,
+        # initialized to zero, for hidden state and cell state of LSTM
+        weight = next(self.parameters()).data
 
-        x = data[:-1]
-        y = data[1:]
+        hidden = (weight.new(self.n_layers, batch_size, self.n_hidden).zero_(),
+                    weight.new(self.n_layers, batch_size, self.n_hidden).zero_()) 
+        return hidden
+
+#%%
+# not tested yet
+# Save the checkpoint
+def save_checkpoint(net, loss):
+  checkpoint = {    'n_inputs': net.input_size,
+                    'n_hidden': net.n_hidden,
+                    'n_layers': net.n_layers,
+                    'state_dict': net.state_dict(),
+                    'loss' : loss} 
+  torch.save(checkpoint, 'checkpoint.pth')        
+
+#%%
+def train(net, data_train, data_validation, epochs=10, batch_size=10, seq_length=50, lr=0.001, clip=5):
+    ''' Training a network   
+        Arguments
+        --------- 
+        net: CharRNN network
+        data: data to train the network
+        epochs: Number of epochs to train
+        batch_size: Number of mini-sequences per mini-batch, aka batch size
+        seq_length: Number of character steps per mini-batch
+        lr: learning rate
+        clip: gradient clipping
+        print_every: Number of steps for printing training and validation loss
+    
+    '''
+    net.train()
+    
+    opt = torch.optim.Adam(net.parameters(), lr=lr)
+    criterion = nn.MSELoss()
+  
+    counter = 0
+    train_losses = []
+    val_losses = []
+    min_val_loss = np.Inf
+    for e in range(epochs):
+        # initialize hidden state
+        h = net.init_hidden(batch_size)
         
-        # convert data into Tensors
-        x_tensor = torch.Tensor(x).unsqueeze(0) # unsqueeze gives a 1, batch_size dimension
-        y_tensor = torch.Tensor(y)
-
-        # outputs from the rnn
-        prediction, hidden = rnn(x_tensor, hidden)
-
-        ## Representing Memory ##
-        # make a new variable for hidden and detach the hidden state from its history
-        # this way, we don't backpropagate through the entire history
-        hidden = hidden.data
-
-        # calculate the loss
-        loss = criterion(prediction, y_tensor)
-        # zero gradients
-        optimizer.zero_grad()
-        # perform backprop and update weights
-        loss.backward()
-        optimizer.step()
-
-        # display loss and predictions
-        if batch_i%print_every == 0:        
-            print('Loss: ', loss.item())
-            plt.plot(time_steps[1:], x, 'r.') # input
-            plt.plot(time_steps[1:], prediction.data.numpy().flatten(), 'b.') # predictions
-            plt.show()
-    
-    return rnn
+        for inputs, targets in get_batches(data_train, batch_size, seq_length):
+            counter += 1
+            # Creating new variables for the hidden state, otherwise
+            # we'd backprop through the entire training history
+            h = tuple([each.data for each in h])
+            # zero accumulated gradients
+            net.zero_grad()
+            
+            # get the output from the model
+            output, h = net(inputs, h)
+            
+            # calculate the loss and perform backprop
+            loss = criterion(output, targets.view(batch_size*seq_length,-1))
+            train_losses.append(loss.item())
+            loss.backward()
+            # `clip_grad_norm` helps prevent the exploding gradient problem in RNNs / LSTMs.
+            nn.utils.clip_grad_norm_(net.parameters(), clip)
+            opt.step()
+            
+            # loss stats
+            # Get validation loss
+            val_h = net.init_hidden(batch_size)
+            net.eval()
+            for inputs, targets in get_batches(valid_data, batch_size, seq_length):
+                
+                output, val_h = net(inputs, val_h)
+                val_loss = criterion(output, targets.view(batch_size*seq_length,-1))
+                val_losses.append(val_loss.item())
+            
+            net.train() # reset to train mode after iterationg through validation data
+            
+            print("Epoch: {}/{}...".format(e+1, epochs),
+                    "Loss: {:.4f}...".format(loss.item()),
+                    "Val Loss: {:.4f}".format(np.mean(val_losses)))
+                    no_loss_decrease_steps += 1
+            # not tested yet        
+            '''if val_loss < min_val_loss:
+                min_val_loss = val_loss
+                save_checkpoint(net, val_loss)
+                print(f"model saved with {val_loss)} validation loss")'''        
+            # print plot of loss         
+            if counter % 5 == 0:        
+                plt.plot(train_losses, label='Training loss')
+                plt.plot(val_losses, label='Validation loss')
+                plt.legend(frameon=False)
+                plt.show()      
 
 
 #%%
-# train the rnn and monitor results
-n_steps = 75
-print_every = 15
+# define and print the net
+n_hidden=512
+n_layers=2
+net = LSTMForecaster(number_of_features, n_hidden, n_layers)
+print(net)
 
-trained_rnn = train(rnn, n_steps, print_every)
+#%%
+batch_size = 2
+seq_length = 30
+n_epochs = 100 # start smaller if you are just testing initial behavior
 
-#%% [markdown]
-# ### Time-Series Prediction
-# 
-# Time-series prediction can be applied to many tasks. Think about weather forecasting or predicting the ebb and flow of stock market prices. You can even try to generate predictions much further in the future than just one time step!
-
+# train the model
+train(net, train_data, valid_data, epochs=n_epochs, batch_size=batch_size, seq_length=seq_length, lr=0.001)               
