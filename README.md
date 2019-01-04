@@ -15,6 +15,14 @@ We use weather information only from one weather station, and we use only the ma
 
 In this project, we build the deep learning part of the model.
 
+## Main Files
+
+'create_data.py': Prepares the daily data from the row datafiles.
+
+'pollution_forecaster.ipynb' and 'pollution_forecaster.py': Shapes the data to model input, instantiates, trains, tests the model.
+
+'pollution_model.py': Containes the model and important functions to train it. 
+
 ## Data Explanation
 
 The *'data\daily_clean_full.csv'* file contains the daily data of the weather parameters and air pollution (pm10) parameters. This is the cleaned merge of the *'daily_pm10.xlsx'* and the *'hourly_lorinc_2011-2018.xls'*
