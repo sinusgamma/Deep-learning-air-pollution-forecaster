@@ -17,9 +17,10 @@ In this project, we build the deep learning part of the model.
 
 ## Main Files
 
-'create_data.py': Prepares the daily data from the row datafiles.
+'pollution_forecaster.ipynb' and 'pollution_forecaster.py': 
+You can train and load the model from these files, play with the parameters and check the performance.
 
-'pollution_forecaster.ipynb' and 'pollution_forecaster.py': Shapes the data to model input, instantiates, trains, tests the model.
+'create_data.py': Prepares the daily data from the row datafiles.
 
 'pollution_model.py': Containes the model and important functions to train it. 
 
@@ -89,7 +90,7 @@ The day1 errors show what happens if we input our pollution concentration foreca
 
 ## How to improve?
 
-There are lots of ways to improve the model. Our input data could be better, we didn't use hyperparameter optimization, it is possible to use input and forecast over an area, not only a station, or inputting data from real forecast and check what the model predicts for the next day.
+There are lots of ways to improve the model performance. Our input data could be better for training, we didn't use hyperparameter optimization, it is possible to use input and forecast over an area, not only a station, or inputting data from real forecast and check what the model predicts for the next day.
 
 
 ## License
