@@ -73,18 +73,22 @@ Our model was better, but the difference isn't very large:
 
 ![alt text](https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/error_forecast.JPG)
 
-We have to compare here the day0 errors.
+We have to compare here the day0 errors with the 'yesterday=today' forecast errors.
 
+The day1 errors show what happens if we input our pollution concentration forecast as input for the next day. It is not a surprise that for the next they our forecast will be worse.
 
-## Authors and Contributors
+![alt text](https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/forecast_vs_act.JPG)
 
-* **xy** - github and/or linkedin link
+## How to improve?
+
+There are lots of ways to improve the model. Our input data could be better, we didn't use hyperparameter optimization, it is possible to use input and forecast over an area, not only a station, or inputing data from real forecast and check what the model predicts for the next day.
 
 
 ## License
 
 This project is licensed under the GNU GENERAL PUBLIC LICENSE - see the [LICENSE.md](LICENSE.md) file for details
 
+
 ## Acknowledgments
-Udacity, Facebook
+Thanks for Facebook and Udacity for the chance to learn DL.
 
