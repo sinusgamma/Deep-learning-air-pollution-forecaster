@@ -3,6 +3,9 @@
 
 Air pollution forecaster based on weather data and earlier pollution measurements.
 
+Side Project for: PyTorch Scholarship Challenge from Facebook
+https://www.udacity.com/facebook-pytorch-scholarship
+
 ## Project Idea
 
 Numerical models are good at forecasting common weather parameters like wind or temperature, but they aren't so good at all weather-related problems. Air pollution is difficult to forecast because apart from the weather parameters we have to know the sources and sinks of the pollution during the forecast period. Most of the time these sources and sinks aren't well determined. We hoped that an LSTM model can be used to predict the PM10 concentration. 
@@ -14,6 +17,8 @@ We expect that the deep learning part of the model can help to grab the yearly, 
 We use weather information only from one weather station, and we use only the main parameters, so we don't expect very good performance, but this model can be a good basis for later improvements.
 
 In this project, we build the deep learning part of the model.
+
+This is a beginner project, we used codesnippets from the challenge course, especially from the character rnn forecast: https://github.com/udacity/deep-learning-v2-pytorch/tree/master/recurrent-neural-networks/char-rnn
 
 ## Main Files
 
