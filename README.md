@@ -41,6 +41,8 @@ During training we used 2011-2016 for training, 2017 for validation and 2018 for
 
 We presumed some weekly pattern in air pollution concentration because of the traffic during the week, and yearly pattern because of the heating period, so we tried to help the model to learn this patterns by converting the day of the week and the day of the year to periodic form. This is detailed in pollution_forecaster.ipynb. But after training the model with and without these parameters we got only very small performance improvement.
 
+'create_data.py' was used to prepare the dataset used in the model.
+
 ### Simplifications
 * Our model will use weather data only from one point in space. Because we try to forecast the pollution only in city level, we consider that point representative for the area. This point is our weather station.
 * Instead of numerical weather forecast data we use station data for training. We don't use numerical forecast data for the training, because the numerical forecast can be wrong, and for training we need 'perfect' weather prediction, because our model is responsible only for the air pollution prediction part.
@@ -57,15 +59,22 @@ We used daily data, in our model one step is one day.
 ![alt text](https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/first_model_idea.JPG)
 
 
-### Model B description
+### Model Performance
 
-In model B in our input and label can be all air quality station. Maybe this helps to improve the model.
+Really good performance would have been a surprise, because we used only one station as input, and not all available weather parameters. What every forecast model must outperform is the prediction of yesterday. This means that we say every day, that we expect the same as yesterday. And this isn't a really bad model.
 
-### Model C, D . . . description
+In our test period during 2018 the 'yesterday=today' forecast would yield the following errors.
+![alt text]
+https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/error_noforecast.JPG 
 
-Any idea what the group accepts.
+Not so bad on average.
 
-#You are welcome to build model A, B, or any new idea.
+Our model was better, but the difference isn't very large:
+![alt text]
+https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/error_forecast.JPG
+
+We have to compare here the day0 errors.
+
 
 ## Authors and Contributors
 
