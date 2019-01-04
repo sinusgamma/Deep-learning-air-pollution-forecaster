@@ -64,14 +64,14 @@ We used daily data, in our model one step is one day.
 Really good performance would have been a surprise, because we used only one station as input, and not all available weather parameters. What every forecast model must outperform is the prediction of yesterday. This means that we say every day, that we expect the same as yesterday. And this isn't a really bad model.
 
 In our test period during 2018 the 'yesterday=today' forecast would yield the following errors.
-![alt text]
-https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/error_noforecast.JPG 
+
+![alt text](https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/error_noforecast.JPG)
 
 Not so bad on average.
 
 Our model was better, but the difference isn't very large:
-![alt text]
-https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/error_forecast.JPG
+
+![alt text](https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/error_forecast.JPG)
 
 We have to compare here the day0 errors.
 
