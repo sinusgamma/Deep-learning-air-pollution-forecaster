@@ -10,7 +10,7 @@ https://www.udacity.com/facebook-pytorch-scholarship
 
 Numerical models are good at forecasting common weather parameters like wind or temperature, but they aren't so good at all weather-related problems. Air pollution is difficult to forecast because apart from the weather parameters we have to know the sources and sinks of the pollution during the forecast period. Most of the time these sources and sinks aren't well determined. We hoped that an LSTM model can be used to predict the PM10 concentration. 
 
-Our model will calculate only the PM10 concentration, while a weather forecast model can calculate the wind, temperature, precipitation or other parameters that can be the input of our model. For training instead of numerical model data we use station data for the weather parameter input.
+Our model will calculate only the PM10 concentration, while a weather forecast model can calculate the wind, temperature, precipitation or other parameters that can be the input of our model. For training we use station data for the weather parameter input instead of numerical prediction data.
 
 We expect that the deep learning part of the model can help to grab the yearly, weekly or other patterns in air pollution fluctuation because of changes in traffic, heating or other effects.
 
