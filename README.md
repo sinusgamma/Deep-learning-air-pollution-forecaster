@@ -74,7 +74,7 @@ In time t we know the weather forecast for that time t, and we know the pollutio
 
 We used daily data, in our model one step is one day.
 
-![alt text](https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/first_model_idea.JPG)
+![alt text](https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/base_model.JPG)
 
 
 ### Model Performance
@@ -100,6 +100,24 @@ The day1 errors show what happens if we input our pollution concentration foreca
 ## How to improve?
 
 There are lots of ways to improve the model performance. Our input data could be better for training, we could use weather reanalysis and hourly data instead of daily. We didn't use hyperparameter optimization. It is possible to use input and forecast over an area, not only a station. We could connect our model with real forecast and check what the model predicts for the next day.
+
+### Model ideas for hourly steps
+
+In the image below we can see two possible way to use hourly input.
+
+Model A
+This is almost the same as our original model, but instead of daily steps it uses hourly steps.
+This model could give us hourly concentration forecast.
+
+Model B
+Here our input would be hourly data, but our label would be daily average air pollution concentration for the next day.
+
+Model A could predict every hour, but because every prediction would be an input of the next step, the error could be very large at the 24th step.
+Model B could predict only the daily average concentration (or the hourly 24 hours later), but it wouldn't need the earlier prediction of the model in every step, the new information would be only the hourly weather, after the first step we could even omit the pollution concentration input.
+
+There are other possible architectures which could improve the prediction, and it doesn't seem trivial which can be better. Best to try all that seems reasonable.
+
+![alt text](https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/modelAB.JPG)
 
 
 ## License
