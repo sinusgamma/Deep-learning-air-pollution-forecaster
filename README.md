@@ -105,11 +105,11 @@ There are lots of ways to improve the model performance. Our input data could be
 
 In the image below we can see two possible ways to use hourly input.
 
-Model A
+Model A:<br />
 This is almost the same as our original model, but instead of daily steps it uses hourly steps.
 This model could give us hourly concentration forecast.
 
-Model B
+Model B:<br />
 Here our input would be hourly data, but our label would be daily average air pollution concentration for the next day.
 
 Model A could predict every hour, but because every prediction would be an input of the next step, the error could be very large at the 24th step.
