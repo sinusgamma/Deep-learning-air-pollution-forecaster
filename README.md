@@ -103,7 +103,7 @@ There are lots of ways to improve the model performance. Our input data could be
 
 ### Model ideas for hourly steps
 
-In the image below we can see two possible way to use hourly input.
+In the image below we can see two possible ways to use hourly input.
 
 Model A
 This is almost the same as our original model, but instead of daily steps it uses hourly steps.
