@@ -113,7 +113,7 @@ Model B:<br />
 Here our input would be hourly data, but our label would be daily average air pollution concentration for the next day.
 
 Model A could predict every hour, but because every prediction would be an input of the next step, the error could be very large at the 24th step.
-Model B could predict only the daily average concentration (or the hourly 24 hours later), but it wouldn't need the earlier prediction of the model in every step, the new information would be only the hourly weather, after the first step we could even omit the pollution concentration input.
+Model B could predict only the daily average concentration (or the hourly 24 hours later), but it wouldn't need the earlier prediction of the model in every step, the new information would be only the hourly weather, after the first step we could even omit the pollution concentration input. This way the model's own errors in the subsequent steps wouldn't affect the prediction.
 
 There are other possible architectures which could improve the prediction, and it doesn't seem trivial which can be better. Best to try all that seems reasonable.
 
