@@ -121,9 +121,9 @@ There are other possible architectures which could improve the prediction, and i
 
 
 ## Contributors
-István Véber - https://www.linkedin.com/in/veber-istvan/
-Krisztián Hackle
-Dr. Axel Ország-Krisz - https://github.com/okaxel
+István Véber - https://www.linkedin.com/in/veber-istvan/<br />
+Krisztián Hackle<br />
+Dr. Axel Ország-Krisz - https://github.com/okaxel<br />
 
 
 ## License
