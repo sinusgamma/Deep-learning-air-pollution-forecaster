@@ -120,6 +120,12 @@ There are other possible architectures which could improve the prediction, and i
 ![alt text](https://github.com/sinusgamma/Deep-learning-air-pollution-forecaster/blob/master/image/modelAB.JPG)
 
 
+## Contributors
+István Véber - https://www.linkedin.com/in/veber-istvan/
+Krisztián Hackle
+Dr. Axel Ország-Krisz - https://github.com/okaxel
+
+
 ## License
 
 This project is licensed under the GNU GENERAL PUBLIC LICENSE - see the [LICENSE.md](LICENSE.md) file for details
