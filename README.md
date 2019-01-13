@@ -1,7 +1,7 @@
 # Deep learning air-pollution forecaster
 ## Project for Udacity PyTorch Scholarship Challenge from Facebook
 
-## ***Side Project Winner of the Environment Category - PyTorch Scholarship Challenge from Facebook***
+## **Winner of the Environment Category in Side Projects - PyTorch Scholarship Challenge from Facebook**
 
 Air pollution PM10 forecaster based on weather data and earlier pollution measurements.
 
