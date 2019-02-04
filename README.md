@@ -20,7 +20,7 @@ We use weather information only from one weather station, and we use only the ma
 
 In this project, we build the deep learning part of the model.
 
-This is a beginner project, we used codesnippets from the challenge course, especially from the character rnn forecast: https://github.com/udacity/deep-learning-v2-pytorch/tree/master/recurrent-neural-networks/char-rnn
+This is an "Udacity PyTorch Scholarship Challenge from Facebook" project, we used codesnippets from the challenge course, especially from the character rnn forecast: https://github.com/udacity/deep-learning-v2-pytorch/tree/master/recurrent-neural-networks/char-rnn
 
 ## Main Files
 

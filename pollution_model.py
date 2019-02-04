@@ -115,7 +115,7 @@ def train(net, data_train, data_validation, epochs=10, batch_size=10, seq_length
     ''' Training a network   
         Arguments
         --------- 
-        net: CharRNN network
+        net: network
         data: data to train the network
         epochs: Number of epochs to train
         batch_size: Number of mini-sequences per mini-batch, aka batch size
