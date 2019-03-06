@@ -101,7 +101,7 @@ The day1 errors show what happens if we input our pollution concentration foreca
 
 ## How to improve?
 
-There are lots of ways to improve the model performance. Our input data could be better for training, we could use weather reanalysis and hourly data instead of daily. We didn't use hyperparameter optimization. It is possible to use input and forecast over an area, not only a station. We could connect our model with real forecast and check what the model predicts for the next day.
+There are lots of ways to improve the model performance. Our input data could be better for training, we could use weather reanalysis and hourly data instead of daily. We didn't use hyperparameter optimization. It is possible to use input and forecast over an area, not only a station. We could connect our model with real forecast and check what the model predicts for the next day. We used only one weather station, which is relativelly far from the air-quality station, so the weather station isn't perfectly representative, we could use data augmentation (e.g. random noise).
 
 ### Model ideas for hourly steps
 
