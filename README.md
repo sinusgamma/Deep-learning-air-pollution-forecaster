@@ -134,4 +134,4 @@ This project is licensed under the GNU GENERAL PUBLIC LICENSE - see the [LICENSE
 
 
 ## Acknowledgments
-Thanks for Facebook and Udacity for the chance to learn DL.
+Thanks for Facebook and Udacity for the chance to learn Deep Learning and Pytorch.
